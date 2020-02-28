@@ -4,7 +4,7 @@ import axios from "axios";
 const initialColor = {
   color: "",
   code: { hex: "" },
-  id: Date.now()
+  id: null
 };
 
 const ColorList = ({ colors, updateColors, setChange, axiosWithAuth }) => {
@@ -13,11 +13,13 @@ const ColorList = ({ colors, updateColors, setChange, axiosWithAuth }) => {
   const [colorToEdit, setColorToEdit] = useState(initialColor);
 
   const editColor = color => {
+    console.log("ran editColor")
     setEditing(true);
     setColorToEdit(color);
   };
 
   const cancelColor = () => {
+    console.log("ran cancelColor")
     setColorToEdit(initialColor)
     setEditing(false)
   }
@@ -25,13 +27,17 @@ const ColorList = ({ colors, updateColors, setChange, axiosWithAuth }) => {
   console.log(colorToEdit)
 
   const saveNewColor = e => {
+    console.log("ran saveNewColor")
+
     e.preventDefault();
+    setColorToEdit({ ...colorToEdit, id: Date.now() })
     console.log("e inside saveNewColor of ColorList", colorToEdit);
     axiosWithAuth().post(`http://localhost:5000/api/colors`, colorToEdit);
     setChange(true);
   }
 
   const saveEdit = e => {
+    console.log("ran saveEdit")
     e.preventDefault();
     console.log("e inside saveEdit of ColorList", colorToEdit);
     axiosWithAuth().put(`http://localhost:5000/api/colors/${colorToEdit.id}`, colorToEdit);
@@ -42,6 +48,7 @@ const ColorList = ({ colors, updateColors, setChange, axiosWithAuth }) => {
   };
 
   const deleteColor = color => {
+    console.log("ran deleteColor")
     // make a delete request to delete this color
     console.log(color);
     axiosWithAuth().delete(`http://localhost:5000/api/colors/${color.id}`);
@@ -53,7 +60,7 @@ const ColorList = ({ colors, updateColors, setChange, axiosWithAuth }) => {
       <p>colors</p>
       <ul>
         {colors.map(color => (
-          <li key={color.color} onClick={() => editColor(color)}>
+          <li key={color.id} onClick={() => editColor(color)}>
             <span>
               <span className="delete" onClick={e => {
                 e.stopPropagation();
@@ -97,7 +104,7 @@ const ColorList = ({ colors, updateColors, setChange, axiosWithAuth }) => {
           </label>
           <div className="button-row">
             <button type="submit">save</button>
-            <button onClick={() => setEditing(false)}>cancel</button>
+            <button type="button" onClick={() => cancelColor()}>cancel</button>
           </div>
         </form>
       ) : (<form onSubmit={saveNewColor}>
@@ -125,7 +132,7 @@ const ColorList = ({ colors, updateColors, setChange, axiosWithAuth }) => {
         </label>
         <div className="button-row">
           <button type="submit">save</button>
-          <button onClick={() => cancelColor()}>cancel</button>
+          <button type="button" onClick={() => cancelColor()}>cancel</button>
         </div>
       </form>)}
       <div className="spacer" />
