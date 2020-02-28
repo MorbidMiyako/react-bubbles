@@ -3,7 +3,8 @@ import axios from "axios";
 
 const initialColor = {
   color: "",
-  code: { hex: "" }
+  code: { hex: "" },
+  id: Date.now()
 };
 
 const ColorList = ({ colors, updateColors, setChange, axiosWithAuth }) => {
@@ -15,6 +16,20 @@ const ColorList = ({ colors, updateColors, setChange, axiosWithAuth }) => {
     setEditing(true);
     setColorToEdit(color);
   };
+
+  const cancelColor = () => {
+    setColorToEdit(initialColor)
+    setEditing(false)
+  }
+
+  console.log(colorToEdit)
+
+  const saveNewColor = e => {
+    e.preventDefault();
+    console.log("e inside saveNewColor of ColorList", colorToEdit);
+    axiosWithAuth().post(`http://localhost:5000/api/colors`, colorToEdit);
+    setChange(true);
+  }
 
   const saveEdit = e => {
     e.preventDefault();
@@ -53,18 +68,17 @@ const ColorList = ({ colors, updateColors, setChange, axiosWithAuth }) => {
               className="color-box"
               style={{ backgroundColor: color.code.hex }}
             />
-            <button onClick={() => { deleteColor(color) }}>Delete</button>
           </li>
         ))}
       </ul>
       {editing ? (
         <form onSubmit={saveEdit}>
-          <legend>add color</legend>
+          <legend>edit color</legend>
           <label>
             color name:
             <input
               onChange={e =>
-                setColorToEdit({ ...colorToEdit, color: e.target.value, id: Date.now() })
+                setColorToEdit({ ...colorToEdit, color: e.target.value })
               }
               value={colorToEdit.color}
             />
@@ -86,8 +100,8 @@ const ColorList = ({ colors, updateColors, setChange, axiosWithAuth }) => {
             <button onClick={() => setEditing(false)}>cancel</button>
           </div>
         </form>
-      ) : (<form onSubmit={saveEdit}>
-        <legend>edit color</legend>
+      ) : (<form onSubmit={saveNewColor}>
+        <legend>add color</legend>
         <label>
           color name:
             <input
@@ -111,7 +125,7 @@ const ColorList = ({ colors, updateColors, setChange, axiosWithAuth }) => {
         </label>
         <div className="button-row">
           <button type="submit">save</button>
-          <button onClick={() => setEditing(false)}>cancel</button>
+          <button onClick={() => cancelColor()}>cancel</button>
         </div>
       </form>)}
       <div className="spacer" />
