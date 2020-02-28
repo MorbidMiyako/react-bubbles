@@ -18,6 +18,9 @@ const ColorList = ({ colors, updateColors, setChange, axiosWithAuth }) => {
 
   const saveEdit = e => {
     e.preventDefault();
+    console.log("e inside saveEdit of ColorList", colorToEdit);
+    axiosWithAuth().put(`http://localhost:5000/api/colors/${colorToEdit.id}`, colorToEdit);
+    setChange(true);
     // Make a put request to save your updated color
     // think about where will you get the id from...
     // where is is saved right now?
@@ -54,14 +57,14 @@ const ColorList = ({ colors, updateColors, setChange, axiosWithAuth }) => {
           </li>
         ))}
       </ul>
-      {editing && (
+      {editing ? (
         <form onSubmit={saveEdit}>
-          <legend>edit color</legend>
+          <legend>add color</legend>
           <label>
             color name:
             <input
               onChange={e =>
-                setColorToEdit({ ...colorToEdit, color: e.target.value })
+                setColorToEdit({ ...colorToEdit, color: e.target.value, id: Date.now() })
               }
               value={colorToEdit.color}
             />
@@ -83,7 +86,34 @@ const ColorList = ({ colors, updateColors, setChange, axiosWithAuth }) => {
             <button onClick={() => setEditing(false)}>cancel</button>
           </div>
         </form>
-      )}
+      ) : (<form onSubmit={saveEdit}>
+        <legend>edit color</legend>
+        <label>
+          color name:
+            <input
+            onChange={e =>
+              setColorToEdit({ ...colorToEdit, color: e.target.value })
+            }
+            value={colorToEdit.color}
+          />
+        </label>
+        <label>
+          hex code:
+            <input
+            onChange={e =>
+              setColorToEdit({
+                ...colorToEdit,
+                code: { hex: e.target.value }
+              })
+            }
+            value={colorToEdit.code.hex}
+          />
+        </label>
+        <div className="button-row">
+          <button type="submit">save</button>
+          <button onClick={() => setEditing(false)}>cancel</button>
+        </div>
+      </form>)}
       <div className="spacer" />
       {/* stretch - build another form here to add a color */}
     </div>
