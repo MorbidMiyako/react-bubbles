@@ -6,8 +6,8 @@ const initialColor = {
   code: { hex: "" }
 };
 
-const ColorList = ({ colors, updateColors }) => {
-  console.log(colors);
+const ColorList = ({ colors, updateColors, setChange, axiosWithAuth }) => {
+  console.log("colors inside ColorList", colors);
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
 
@@ -25,6 +25,9 @@ const ColorList = ({ colors, updateColors }) => {
 
   const deleteColor = color => {
     // make a delete request to delete this color
+    console.log(color);
+    axiosWithAuth().delete(`http://localhost:5000/api/colors/${color.id}`);
+    setChange(true);
   };
 
   return (
@@ -35,11 +38,11 @@ const ColorList = ({ colors, updateColors }) => {
           <li key={color.color} onClick={() => editColor(color)}>
             <span>
               <span className="delete" onClick={e => {
-                    e.stopPropagation();
-                    deleteColor(color)
-                  }
-                }>
-                  x
+                e.stopPropagation();
+                deleteColor(color)
+              }
+              }>
+                x
               </span>{" "}
               {color.color}
             </span>
@@ -47,6 +50,7 @@ const ColorList = ({ colors, updateColors }) => {
               className="color-box"
               style={{ backgroundColor: color.code.hex }}
             />
+            <button onClick={() => { deleteColor(color) }}>Delete</button>
           </li>
         ))}
       </ul>
